@@ -5,6 +5,8 @@ import { resolvers } from "./resolvers.js";
 import { TrackAPI } from "./datasources/TrackApi.js";
 import { DataSourceContext } from "./context.js";
 import { FilmApi } from "./datasources/FilmApi.js";
+import { getUser } from "./modules/auth.js";
+import db from "./datasources/db.js";
 
 const server = new ApolloServer({
   typeDefs,
@@ -13,13 +15,17 @@ const server = new ApolloServer({
 
 const { url } = await startStandaloneServer(server, {
   listen: { port: 4000 },
-  context: async () => {
+  context: async ({ req }) => {
     const cache = server.cache;
+    const authorization = req.headers.authorization?.split("Bearer ")?.[1];
+    const user = authorization ? getUser(authorization) : null;
     return {
       dataSources: {
         trackAPI: new TrackAPI({ cache }),
         filmAPI: new FilmApi({ cache }),
+        db,
       },
+      user,
     } satisfies DataSourceContext;
   },
 });

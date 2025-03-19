@@ -4,6 +4,7 @@ import { typeDefs } from "./schema.js";
 import { resolvers } from "./resolvers.js";
 import { TrackAPI } from "./datasources/TrackApi.js";
 import { DataSourceContext } from "./context.js";
+import { FilmApi } from "./datasources/FilmApi.js";
 
 const server = new ApolloServer({
   typeDefs,
@@ -17,6 +18,7 @@ const { url } = await startStandaloneServer(server, {
     return {
       dataSources: {
         trackAPI: new TrackAPI({ cache }),
+        filmAPI: new FilmApi({ cache }),
       },
     } satisfies DataSourceContext;
   },

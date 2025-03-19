@@ -1,4 +1,4 @@
-import { Speciality } from "../types";
+import { Speciality } from "../types.js";
 
 export const doctorsData = [
   {

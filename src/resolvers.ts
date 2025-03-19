@@ -4,6 +4,7 @@ import { operationQueries } from "./domain/operations/queries.js";
 import { colorQueries } from "./domain/color/queries.js";
 import { TrackQueries } from "./domain/track/queries.js";
 import { TrackResolver } from "./domain/track/models.js";
+import { createUser, userMutations } from "./user/mutations.js";
 
 export const resolvers: Resolvers = {
   Query: {
@@ -79,5 +80,7 @@ export const resolvers: Resolvers = {
         };
       }
     },
+
+    ...userMutations,
   },
 };

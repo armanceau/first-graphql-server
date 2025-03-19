@@ -6,78 +6,63 @@ import { GraphQLError } from "graphql";
 
 type UserMutations = WithRequired<MutationResolvers, "createUser" | "signIn">;
 
-export const createUser: MutationResolvers["createUser"] = async (
+const createUser: NonNullable<MutationResolvers["createUser"]> = async (
   _,
   { username, password },
-  { dataSources },
-  __
+  { dataSources: { db } }
 ) => {
   try {
-    const createdUser = await dataSources.db.user.create({
+    const createdUser = await db.user.create({
       data: {
         username,
         password: await hashPassword(password),
       },
     });
-    return {
-      code: 201,
-      message: "the user has been created",
-      success: true,
-      user: {
-        id: createdUser.id,
-        username: createdUser.username,
-      },
-    };
-  } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError) {
-      return {
-        code: 401,
-        message: e.message,
-        success: false,
-        user: null,
-      };
-    }
 
     return {
+      code: 201,
+      message: "user has been created",
+      success: true,
+      user: createdUser,
+    };
+  } catch {
+    return {
       code: 400,
-      message: (e as Error).message,
+      message: "User has not been created",
       success: false,
       user: null,
     };
   }
 };
 
-const signIn: NonNullable<MutationResolvers["createUser"]> = async (
+const signIn: NonNullable<MutationResolvers["signIn"]> = async (
   _,
   { username, password },
-  { dataSources: { db } },
-  __
+  { dataSources: { db } }
 ) => {
   try {
     const user = await db.user.findFirstOrThrow({ where: { username } });
     const isValidPassword = await comparePasswords(password, user.password);
 
     if (!isValidPassword) {
-      throw new GraphQLError("Someting wrong happened...");
+      throw new GraphQLError("Something wrong happened");
     }
 
     const token = createJWT(user);
 
     return {
       code: 200,
-      message: "the user authenticated",
+      message: "User authenticated",
       success: true,
       token,
     };
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError) {
-      return {
-        code: 401,
-        message: e.message,
-        success: false,
-        token: null,
-      };
-    }
+    return {
+      code: 401,
+      message: `${(e as Error)?.message}`,
+      success: false,
+      token: null,
+    };
   }
 };
 

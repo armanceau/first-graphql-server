@@ -1,12 +1,14 @@
+import { Speciality } from "../types";
+
 export const doctorsData = [
   {
     id: "1",
     name: "Samia Mekame",
-    speciality: "OPHTALMOLOGIST",
+    speciality: Speciality.Ophtalmologist,
   },
   {
     id: "2",
     name: "Catherine Bedoy",
-    speciality: "PSYCHOLOGIST",
+    speciality: Speciality.Psychologist,
   },
 ];

@@ -2,8 +2,9 @@ import { doctorsData } from "./datasources/doctors.js";
 import { colorsData } from "./datasources/colors.js";
 import closestColor from "./functions/color.js";
 import { GraphQLError } from "graphql";
+import { Resolvers } from "./types.js";
 
-export const resolvers = {
+export const resolvers: Resolvers = {
   Query: {
     doctors: (_, { specialities }) => {
       return doctorsData.filter((el) => specialities.includes(el.speciality));
@@ -32,5 +33,12 @@ export const resolvers = {
       }
       return closestColor(color, colorsData);
     },
+    getTracks: (_, __, { dataSources }, ___) => {
+      return dataSources.trackAPI.getTracks();
+    },
+  },
+  Track: {
+    author: (parent, _, { dataSources }) =>
+      dataSources.trackAPI.getAuthorBy(parent.authorId),
   },
 };
